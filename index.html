@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piano</title>
+    <style>
+        body{
+    margin: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.piano{
+    width: 1300px;
+    height: 600px;
+    background-color: #1a1a1a;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    border-radius: 15% 15% 0 0;
+      
+}
+
+.piano__body{
+
+     width: 100%;
+     height: 100%;
+     display: flex;
+     align-items: center;
+     justify-content: space-around;
+     
+}
+
+.piano__speaker{
+    width: 300px;
+    height: 150px;
+    border-radius: 15px;
+    background:
+                radial-gradient(black 15%, transparent 16%) 0 0,
+                radial-gradient(black 15%, transparent 16%) 8px 8px,
+                radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px,
+                radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 8px 9px;
+                background-color:#282828;
+                background-size:16px 16px;
+}
+
+
+.piano__interface{
+    width: 500px;
+    height: 200px;
+    border-radius: 10px;
+    background-color: #333;
+    box-shadow: inset 0 0 10px #111;
+    color: #fff;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.piano__play-btn , select{
+    font-size: 16px;
+    background-color: #333;
+    color: #fff;
+    border-radius: 15px;
+    box-shadow:rgba(0,0,0,25);
+     
+}
+.piano__keyboard{
+    width: 100%;
+    height: 500px;
+    background-color: #000;
+    display: flex;
+
+}
+
+.piano__key{
+    width: 30px;
+    height: 100%;
+    padding: 0;
+    margin: 0 1px;
+    background-color: #fff;
+    border: 1px solid #000;
+    box-sizing: border-box;
+    text-align: center;
+    border-radius: 0 0 8px 8px;
+    flex: 1;
+
+}
+
+.piano__key--black{
+    background-color: #000;
+    color: #fff;
+    height: 60%;
+    position: absolute;
+    top: 0;
+    left: -15px;
+
+
+}
+.empty-space{
+    position: relative;
+}
+
+.piano__key--white{
+    padding-top: 180px;
+}
+
+.piano__key--playing {
+    background-color: #74b9ff;
+}
+
+
+.piano__autoplay ,label{
+    padding-left: 20px ;
+}
+
+
+.piano__autoplay button{
+    margin-left: 30px;
+    width: 100px;
+
+
+
+}
+    </style>
+</head>
+
+<body>
+
+    <div class="piano">
+        <div class="piano__body">
+            <div class="piano__speaker"></div>
+            <div class="piano__interface">
+                <div class="piano__controls">
+                    <h4 class="piano__heading">Piano</h4>
+                    <label> <input type="radio" class="piano__control__option" name="control" value="letterNotes"
+                            checked>
+                        Letter Notes</label>
+                    <label> <input type="radio" class="piano__control__option" name="control" value="keyboard">
+                        Keyboard</label>
+                    <label> <input type="radio" class="piano__control__option" name="control" value="none"> None</label>
+                </div>
+                <div class="piano__autoplay">
+                    <h4 class="piano__heading">Autoplay</h4>
+                    <select class="piano__song-list">
+                        <option value="2"> Happy Birthday </option>
+                        <option value="1"> Jingle Bells</option>
+                    </select>
+                    <label>Tempo:
+                        <select class="piano__tempo">
+                            <option value="1">Slow</option>
+                            <option value="2" selected>Normal</option>
+                            <option value="3">Fast</option>
+                        </select>
+                    </label>
+                    <button class="piano__play-btn">Play</button>
+                </div>
+
+            </div>
+            <div class="piano__speaker"></div>
+        </div>
+
+
+        <div class="piano__keyboard">
+
+        </div>
+    </div>
+
+
+    <script>
+        let keyboard = document.querySelector('.piano__keyboard')
+let controls = document.querySelectorAll('.piano__control__option')
+let pianoNotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+let keyMap = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N']
+let keys = []
+let tempoSelect = document.querySelector('.piano__tempo')
+let songSelect = document.querySelector('.piano__song-list')
+let playBtn = document.querySelector('.piano__play-btn')
+
+
+let jingleBells = `B3,,B3,,B3,,,,B3,,B3,,B3,,,,
+                       B3,,D4,,G3,,A3,B3,,,,,,
+                       C4,,C4,,C4,,,,C4,C4,,B3,,B3,,,,
+                       B3,B3,B3,,A3,,A3,,B3,,A3,,,,D4`
+
+let happyBirthday = `G4,G4,A4,,G4,,C5,,B4,,,,
+                     G4,G4,A4,,G4,,D5,,C5,,,,
+                     G4,G4,G5,,E5,,C5,,B4,,A4,,
+                     F5,F5,E5,,C5,,D5,,C5,,,,`
+
+
+
+
+
+
+// initial function 
+let init = () => {
+    for (let i = 1; i <= 5; i++) {
+        for (let j = 0; j < 7; j++) {
+            let key = createKey('white', pianoNotes[j], i)
+            key.dataset.keyboard = keyMap[j + (i - 1) * 7]
+            keyboard.appendChild(key);
+
+            if (j != 2 && j != 6) {
+                key = createKey('black', pianoNotes[j], i)
+                key.dataset.keyboard = '⇧+' + keyMap[j + (i - 1) * 7]
+                let emptySpace = document.createElement('div')
+                emptySpace.className = 'empty-space'
+                emptySpace.appendChild(key)
+                keyboard.appendChild(emptySpace)
+            }
+
+        }
+    }
+}
+
+
+
+// Create key
+let createKey = (type, note, octave) => {
+    let key = document.createElement('button')
+    key.className = `piano__key piano__key--${type}`
+    key.dataset.letterNote = type == 'white' ? note + octave : note + '#' + octave;
+    key.dataset.letterNoteFileName = type == 'white' ? note + octave : note + 's' + octave;
+    key.textContent = key.dataset.letterNote
+    keys.push(key)
+
+
+
+    key.addEventListener('mousedown', () => {
+        playSound(key);
+        key.classList.add('piano__key--playing')
+    })
+    key.addEventListener('mouseup', () => {
+        key.classList.remove('piano__key--playing')
+    })
+    key.addEventListener('mouseleave', () => {
+        key.classList.remove('piano__key--playing')
+    })
+
+    return key;
+
+}
+
+
+
+
+
+// adding the keybourd sound
+document.addEventListener('keydown', (e) => {
+    if (e.repeat) {
+        return;
+    }
+    pressKey('mousedown', e)
+})
+document.addEventListener('keyup', (e) => {
+    pressKey('mouseup', e)
+})
+
+let pressKey = (mouseEvent, e) => {
+    let lastLetter = e.code.substring(e.code.length - 1)
+    let isShiftPressed = e.shiftKey
+    let selector
+    if (isShiftPressed) {
+        selector = `[data-keyboard="⇧+${lastLetter}"]`
+
+    } else {
+        selector = `[data-keyboard="${lastLetter}"]`
+    }
+    let key = document.querySelector(selector)
+    if (key !== null) {
+        let event = new Event(mouseEvent)
+        key.dispatchEvent(event)
+
+    }
+}
+
+
+
+
+// adding sounds
+let playSound = (key) => {
+    let audio = document.createElement('audio');
+    audio.src = 'sounds/' + key.dataset.letterNoteFileName + '.mp3'
+    audio.play().then(() => audio.remove())
+}
+
+
+
+// control options
+controls.forEach((input) => {
+    input.addEventListener('input', () => {
+        let value = input.value
+        let type
+        switch (value) {
+            case 'letterNotes': type = 'letterNote'; break;
+            case 'keyboard': type = 'keyboard'; break;
+            case 'none': type = ''; break;
+        }
+        keys.forEach((key) => {
+            key.textContent = key.dataset[type]
+        })
+
+    })
+
+})
+
+
+
+
+
+
+// adding Autoplay songs
+let playSong = (notesString, tempo, cb) => {
+    let notes = notesString.split(',')
+    let currentNote = 0
+    let mousedown = new Event('mousedown')
+    let mouseup = new Event('mouseup')
+    let btn
+
+    let interval = setInterval(() => {
+        if (currentNote < notes.length) {
+            if (notes[currentNote].trim() != '') {
+                if (btn) {
+                    btn.dispatchEvent(mouseup)
+                }
+                btn = document.querySelector(
+                    `[data-letter-note=${notes[currentNote]}]`
+                );
+                btn.dispatchEvent(mousedown);
+            }
+            currentNote++
+        } else {
+            btn.dispatchEvent(mouseup)
+            clearInterval(interval)
+            cb()
+        }
+    }, 450 / tempo)
+
+}
+
+playBtn.addEventListener('mousedown', () => {
+    let tempo = +tempoSelect.value
+    let songNum = +songSelect.value
+    playBtn.disabled = true
+
+    let enableplaybtn = () => playBtn.disabled = false
+
+    switch (songNum) {
+        case 1: playSong(jingleBells, tempo, enableplaybtn); break;
+
+        case 2: playSong(happyBirthday, tempo, enableplaybtn); break;
+    }
+
+})
+
+
+
+
+init();
+    </script>
+</body>
+
+</html>
